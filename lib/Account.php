@@ -43,16 +43,28 @@ class Account extends APIRequest {
 	 */
 	public static function register($data){
 		PaidLogger::info('--REGISTER--');
+		$invalidParam = self::registerValidateParams($data);
+		if ($invalidParam!==null) {
+			self::$result['error'] = array('code'=>self::ERROR_CODE_PARAM_INVALID,'detail'=>$invalidParam);
+			return self::response();
+		}
 		$postData = array('memberData'=>$data);
-		self::$result = array('status'=>'ERROR','result'=>null,'error'=>null);
 		$response = self::request(PAID_API_REGISTER_PATH, $postData);
 		self::$result['status'] = $response['status'];
 		if (self::$result['status']==='SUCCESS')
 			self::$result['result']=self::registerNormalResultData($response['body']);
 		else 
-			self::$result['error']=self::registerGetErrorCode($response['body']);
-		PaidLogger::info('Result: ' . print_r(self::$result, true));
-		return self::$result;
+			self::$result['error']=array('code'=>self::ERROR_CODE_REQUEST_ERROR,'detail'=>self::registerGetErrorCode($response['body']));
+		return self::response();
+	}
+	private static $registerRequiredParams = 
+		array('b2bMemberId','companyName','companyNameKana','representativeSei',
+		'representativeMei','representativeSeiKana','representativeMeiKana','zipCode',
+		'prefecture','address1','address2','clerkSei','clerkMei','clerkSeiKana','clerkMeiKana',
+		'tel','email'
+	);
+	private static function registerValidateParams($params){
+		return self::validateParams(self::$registerRequiredParams, $params);
 	}
 	
 	private static function registerNormalResultData($responseBodyData){
@@ -70,14 +82,21 @@ class Account extends APIRequest {
 	 */
 	public static function checkStatus($userId){
 		PaidLogger::info('--CHECK STATUS--');
+		if (!self::checkStatusValidateParams($userId)){
+			self::$result['error'] = array('code'=>self::ERROR_CODE_PARAM_INVALID,'detail'=>'userId');
+			return self::response();
+		}
 		$response = self::request(PAID_API_GET_USER_STATUS_PATH, array('b2bMemberIds'=>array($userId)));
 		self::$result['status'] = $response['status'];
 		if ($response['status']==='SUCCESS')
 			self::$result['result']['memberStatusCode'] = self::checkStatusGetMemberStatusCode($userId, $response['body']);
 		else 
-			self::$result['error'] = self::checkStatusGetErrorCode($userId, $response['body']);
-		PaidLogger::info('Result: ' . print_r(self::$result, true));
-		return self::$result;
+			self::$result['error'] = array('code'=>self::ERROR_CODE_REQUEST_ERROR, 'result'=>self::checkStatusGetErrorCode($userId, $response['body']));
+		return self::response();
+	}
+	
+	private static function checkStatusValidateParams($userId){
+		return !self::isValueEmptyOrNull($userId);
 	}
 	
 	private static function checkStatusGetMemberStatusCode($userId, $responseBodyData){
@@ -96,9 +115,5 @@ class Account extends APIRequest {
 			}
 		}
 		return null;
-	}
-	
-	private static function checkKeyExistFromArray($key, $array){
-		return isset($array) || array_key_exists($key, $array);
 	}
 }

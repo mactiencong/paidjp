@@ -14,15 +14,25 @@ class Order extends APIRequest {
 	 */
 	public static function order($data){
 		PaidLogger::info('--ORDER--');
+		$invalidParam = self::orderValidateParams($data);
+		if ($invalidParam!==null) {
+			self::$result['error'] = array('code'=>self::ERROR_CODE_PARAM_INVALID,'detail'=>$invalidParam);
+			return self::response();
+		}
 		$requestOrderResponse = self::requestOrder($data);
 		$response = $requestOrderResponse['status']==='SUCCESS'?self::confirmOrder($data):$requestOrderResponse;
 		self::$result['status'] = $response['status'];
 		if (self::$result['status']==='SUCCESS')
 			self::$result['result']=$response['body'];
-		else 
-			self::$result['error']=$response['body'];
-		PaidLogger::info('Result: ' . print_r(self::$result, true));
-		return self::$result;
+		else {
+			self::$result['error']=array('code'=>self::ERROR_CODE_REQUEST_ERROR,'detail'=>$response['body']);
+		}
+		return self::response();
+	}
+	
+	private static $orderRequiredParams = array('b2bMemberId','contents','code','price','b2bCreditId');
+	private static function orderValidateParams($params){
+		return self::validateParams(self::$orderRequiredParams, $params);
 	}
 	
 	private static function requestOrder($data){
