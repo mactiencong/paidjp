@@ -1,6 +1,6 @@
 <?php
 const PAID_API_DOMAIN = 'https://paid.jp/';
-const PAID_API_AUTH_CODE = 'put_your_auth_code_here';
+const PAID_API_AUTH_CODE = 'eec6b5739dd9aecfff7bd5cf8fac5b2c';
 
 const PAID_API_REGISTER_PATH = 'y/coop/member/register/ver1.0/p.json';
 const PAID_API_GET_USER_STATUS_PATH = 'y/coop/member/check/ver1.0/p.json';

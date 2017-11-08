@@ -17,6 +17,20 @@ class OrderTest extends TestCase
 		$this->assertSame('ERROR', $response['status']);
 	}
 	
+	public function testOrderWithB2bMemberIdIsEmpty()
+	{
+		$data = json_decode('{
+          "b2bMemberId": " ",
+          "contents": "test",
+          "code": "1234567",
+          "price": "1000",
+          "b2bCreditId": "000000001"
+        }', true);
+		$response = Order::order($data);
+		$this->assertSame('ERROR', $response['status']);
+		$this->assertSame('PARAM_INVALID', $response['error']['code']);
+	}
+	
 	public function testOrderWithConfirmedUser()
 	{
 		$data = json_decode('{
@@ -24,7 +38,7 @@ class OrderTest extends TestCase
           "contents": "test",
           "code": "1234567",
           "price": "1000",
-          "b2bCreditId": "0000000101323"
+          "b2bCreditId": "000n000101323"
         }', true);//000000010131
 		$response = Order::order($data);
 		$this->assertSame('SUCCESS', $response['status']);
