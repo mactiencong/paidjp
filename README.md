@@ -1,6 +1,6 @@
 # The lib use paid.jp API for payment.
 # How to use
-1. Fetch source, put to vendors/ directory of your project
+1. Fetch source to your project
 2. Some config for lib in: /config.php. See and update:
 ```
 const PAID_API_AUTH_CODE = 'put_your_auth_code_here';
