@@ -1,4 +1,4 @@
-# The lib use for Yii Framework 1.x to communicate with paid.jp API for payment.
+# The lib use paid.jp API for payment.
 # How to use
 1. Fetch source, put to vendors/ directory of your project
 2. Some config for lib in: /config.php. See and update:
@@ -13,7 +13,7 @@ $result = Account::checkStatus($userId);
 ``` 
 # API Format will be return
 ```
-print_r(self::$result, true)
+print_r($result, true)
 ===>
 Array
 (
